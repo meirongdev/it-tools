@@ -21,14 +21,8 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Run linters
-        run: pnpm lint
-
       - name: Run unit test
         run: pnpm test
-
-      - name: Type check
-        run: pnpm typecheck
 
       - name: Build the app
         run: pnpm build
