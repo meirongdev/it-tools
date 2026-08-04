@@ -5,6 +5,19 @@ on:
     branches:
       - main
   workflow_dispatch:
+  # 每周一 04:00 UTC 定时重建。
+  #
+  # WHY：最终镜像里只有 dist/ + nginx.conf，没有 node_modules —— 它的 CVE 状况完全
+  # 等于运行期 nginx base 的新鲜度，与本仓库代码无关。没有定时重建的话，只要一段时间
+  # 不提交，镜像就静默腐化：2026-08 就发生过一次，Trivy 在 oracle-k3s 上报出 3 条
+  # Critical（含 nginx 1.28.2-r1 的 CVE-2026-42945 任意代码执行, CVSS 8.1），而同期
+  # base 早已修好，纯粹是几个月没重建。
+  #
+  # 定时跑只在默认分支触发；tag 用 type=sha → 同一个 sha-* tag 会被换成内容更新的
+  # 镜像（代码没变、base 变新）。消费端要吃到这个刷新需要 imagePullPolicy: Always
+  # （homelab 侧 it-tools 清单已这么配）。
+  schedule:
+    - cron: "0 4 * * 1"
 
 jobs:
   ci:
